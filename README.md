@@ -1,54 +1,91 @@
-# HoneyBadger — Honeypot Log Analytics
+# HoneyBadger
 
-HoneyBadger is the Sprint 2 data analytics module for the SSH honeypot. It
-uses Pandas to turn Sprint 1 SQLite events into SOC-style answers and uses
-Matplotlib to create charts.
+HoneyBadger is a Python data analytics program that analyzes SSH honeypot logs
+with Pandas and Matplotlib. It identifies common attack patterns and presents
+the results as printed reports and charts for basic SOC analysis.
 
-## Requirements
+## Instructions for Build and Use
 
-```bash
-python3 -m pip install -r requirements.txt
-```
+Steps to build and/or run the software:
 
-## Run the demo
+1. Install Python 3.11 or newer.
+2. Open a terminal in this folder.
+3. Install the required libraries:
 
-From this folder:
+   ```bash
+   python3 -m pip install -r requirements.txt
+   ```
 
-```bash
-python3 analyze_logs.py
-```
+4. Run the analyzer:
 
-If `../SSHoneypot/attacks.db` exists, the script analyzes it. Otherwise, it
-uses `sample_data/honeypot_logs.csv` so the project can be demonstrated without
-waiting for live honeypot traffic.
+   ```bash
+   python3 analyze_logs.py
+   ```
 
-To analyze a specific database or CSV export:
+Instructions for using the software:
 
-```bash
-python3 analyze_logs.py --input ../SSHoneypot/attacks.db
-python3 analyze_logs.py --input sample_data/honeypot_logs.csv
-```
+1. Place a honeypot CSV export in `data/events.csv`, or provide a SQLite
+   database with the `--input` option.
+2. Run the analyzer with the selected dataset:
 
-The script answers:
+   ```bash
+   python3 analyze_logs.py --input data/events.csv
+   ```
+
+3. Review the printed results and the charts saved in the `charts` folder.
+
+If no live database is available, the program uses the included demo dataset
+at `sample_data/honeypot_logs.csv`.
+
+HoneyBadger answers these questions:
 
 1. Which source IPs generate the most logged events?
 2. What hour of the day has the most activity?
+3. What percentage of connections are reconnaissance-only versus credential or
+   command activity?
 
-It also demonstrates the required operations:
+The analysis demonstrates the following operations:
 
-- **Filter:** keep only `LOGIN_FAIL` events for credential analysis.
-- **Sort:** rank the top 10 source IPs and failed-login passwords by count.
-- **Aggregation:** group all events by hour of day with `groupby("hour")`.
-- **Stretch:** save `charts/attack_timeline.png` and
-  `charts/top_passwords.png` with Matplotlib.
+* Filter failed login events with `LOGIN_FAIL`.
+* Sort source IPs and passwords by attempt count.
+* Aggregate events by hour with Pandas `groupby()`.
+* Classify sessions as reconnaissance-only, credential activity, or command
+  activity.
+* Graph the attack timeline and password rankings with Matplotlib.
 
-The Sprint 1 server redacts passwords unless it is deliberately started with
-`--store-passwords`. When passwords are redacted, HoneyBadger still analyzes
-IP, time, username, command, and event-type patterns and explains why the
-password chart has no values.
-
-Run tests with:
+Run the automated tests with:
 
 ```bash
 python3 -m unittest -v test_analyze_logs.py
 ```
+
+## Development Environment
+
+To recreate the development environment, you need the following software
+and/or libraries with the specified versions:
+
+* Python 3.11 or newer
+* Pandas 2.0 or newer
+* Matplotlib 3.7 or newer
+* Any text editor or IDE, such as Visual Studio Code
+* A CSV honeypot export or SQLite honeypot database
+
+## Useful Websites to Learn More
+
+I found these websites useful in developing this software:
+
+* [Python Official Documentation](https://docs.python.org/3/)
+* [Pandas Documentation](https://pandas.pydata.org/docs/)
+* [Pandas GroupBy Documentation](https://pandas.pydata.org/docs/reference/groupby.html)
+* [Matplotlib Documentation](https://matplotlib.org/stable/contents.html)
+* [Python SQLite Documentation](https://docs.python.org/3/library/sqlite3.html)
+
+## Future Work
+
+The following items I plan to fix, improve, and/or add to this project in the future:
+
+* [ ] Add explicit session IDs to the honeypot event records.
+* [ ] Analyze session duration and disconnect reasons.
+* [ ] Add source IP enrichment such as network ownership or geolocation.
+* [ ] Add additional charts for daily activity and repeated scanners.
+* [ ] Compare attempted credentials against a safe, approved wordlist.
